@@ -11,6 +11,7 @@
     <modules>
         <module>01-rocket-mq-quickstart</module>
         <module>02-rocket-mq-example</module>
+        <module>03-rocket-mq-producer</module>
     </modules>
 
 
