@@ -1,5 +1,6 @@
-package study.wyy.mq.rocket.quickstart;
+package study.wyy.mq.rocket.example.consumer;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.rocketmq.client.consumer.DefaultMQPushConsumer;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyContext;
 import org.apache.rocketmq.client.consumer.listener.ConsumeConcurrentlyStatus;
@@ -12,26 +13,26 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 /**
- * @author by wyaoyao
- * @Description： 消费消息example
- * @Date 2020/12/24 10:48 下午
+ * @author: wyaoyao
+ * @date: 2020-12-25 12:41
+ * @description: 广播模式
  */
-public class ConsumeMessageExample {
+@Slf4j
+public class BroadcastingConsumer {
+
     public static void main(String[] args) throws MQClientException {
-        // 1 实例化消息生产者,指定组名
+        // 1 构建消费者, 指定消费者组
         DefaultMQPushConsumer consumer = new DefaultMQPushConsumer("test_consumer_group");
-        // 2 指定Namesrv地址信息.
+        // 2 设置name server地址
         consumer.setNamesrvAddr("localhost:9876");
-        // 3 订阅Topic
-        consumer.subscribe("myTopic", "*");
-        // 4 负载均衡模式消费
-        consumer.setMessageModel(MessageModel.CLUSTERING);
-        // 5 注册回调函数，处理消息
+        // 3 设置订阅的topic
+        consumer.subscribe("myTopic","*");
+        // 4 设置消费模式: 默认是广播
+        consumer.setMessageModel(MessageModel.BROADCASTING);
+        // 5 注册回调函数
         consumer.registerMessageListener(new MessageListenerConcurrently() {
             @Override
             public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext consumeConcurrentlyContext) {
-                System.out.printf("%s 收到消息 : %s %n",
-                        Thread.currentThread().getName(), msgs);
                 // 遍历
                 System.out.println(" ======遍历消息======= ");
                 if (msgs != null && msgs.size() > 0) {
@@ -46,10 +47,8 @@ public class ConsumeMessageExample {
                 return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
             }
         });
-        //6 启动消息者
+        // 6 启动
         consumer.start();
-        // 不要立即关闭，消费者是个监听，立即关闭，会导致消费不到消息
-        //consumer.shutdown();
-    }
 
+    }
 }
